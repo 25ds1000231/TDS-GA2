@@ -1,0 +1,38 @@
+name: Cache prime demo
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  prime:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Cache a dependency directory (example: npm cache)
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: cache-21fd1f8
+
+      # REQUIRED step name per your spec; prints cache hit/miss
+      - name: prime-cache-21fd1f8
+        if: always()
+        run: |
+          echo "cache_hit=${{ steps.cache.outputs.cache-hit }}"
+          if [ "${{ steps.cache.outputs.cache-hit }}" = 'true' ]; then
+            echo "Cache result: HIT"
+          else
+            echo "Cache result: MISS"
+          fi
+
+      # Optional: warm/populate the cache so the next run is a HIT
+      # Replace this with your real dependency install (e.g., npm ci)
+      - name: Warm npm cache (example)
+        run: |
+          mkdir -p ~/.npm
+          echo "primed $(date)" > ~/.npm/_primed_note
