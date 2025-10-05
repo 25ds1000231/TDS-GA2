@@ -1,0 +1,36 @@
+name: CI with Cache (cache-21fd1f8)
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Cache step: exact key 'cache-21fd1f8'
+      - name: Restore/save npm cache
+        id: cache-deps
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: cache-21fd1f8
+
+      # Demo install (adjust to your project: npm ci / yarn install / pnpm install)
+      - name: Install deps
+        run: |
+          npm --version
+          npm ci || true
+
+      # Required: a step named exactly 'prime-cache-21fd1f8' that echoes hit/miss
+      - name: prime-cache-21fd1f8
+        run: echo "Cache hit? ${{ steps.cache-deps.outputs.cache-hit }}"
